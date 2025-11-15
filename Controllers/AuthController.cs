@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SimpleLoginApi.Data;
 using SimpleLoginApi.Models;
@@ -21,10 +22,12 @@ public class AuthController : ControllerBase
     {
         var user = await _context.Users
             .FirstOrDefaultAsync(u => u.KullaniciAdi == request.KullaniciAdi && u.Sifre == request.Sifre);
+        //FİRST OR DEFAULT LİSTEDE ŞARTI SAĞLAYAN İLK ELEMANI VERİR. EĞER BULAMAZSA NULL DEĞERİ DÖNDÜRÜR.
+        //LİSTELERDE AYNI İŞİ YAPAN FİND METODU VAR
 
         if (user == null)
         {
-            return Ok(new LoginResponse
+            return NotFound(new LoginResponse
             {
                 Success = false,
                 Message = "Kullanıcı adı veya şifre hatalı!"
@@ -47,7 +50,7 @@ public class AuthController : ControllerBase
 
         if (existingUser != null)
         {
-            return Ok(new LoginResponse
+            return BadRequest(new LoginResponse
             {
                 Success = false,
                 Message = "Bu kullanıcı adı zaten alınmış!"
@@ -81,7 +84,10 @@ public class AuthController : ControllerBase
     [HttpGet("test")]
     public ActionResult<string> Test()
     {
-        return "API çalışıyor!";
+        return Ok( new LoginResponse
+        {   Success=true,
+            Message="API ÇALIŞIYOR"
+        });
     }
 
     [HttpPut("changepassword")]
